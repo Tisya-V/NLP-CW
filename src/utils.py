@@ -5,7 +5,7 @@ import constants
 def load_full_dataset():
     """ Load the full dataset from the official PCL .tsv file
         From: https://github.com/CRLala/NLPLabs-2024/blob/main/Dont_Patronize_Me_Trainingset/dontpatronizeme_pcl.tsv
-        Returns a pandas DataFrame with a binary label column (0 for non-patronizing, 1 for patronizing)
+        Returns a pandas DataFrame with a binary_label column (0 for non-patronizing, 1 for patronizing)
         Where the original label is >= 2, we consider it patronizing (label=1), otherwise non-patronizing (label=0)
         (As in the original paper)
     """
