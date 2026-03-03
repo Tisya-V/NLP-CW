@@ -1,0 +1,8 @@
+base model only : 0.56
+(batch size 16, eval batch size 32, epoch 4, LR 1e-5)
+
+
+weighted loss : 0.59
+weighted according to original dataset disparity (i.e. 9:1)
+
+augmentation : 
