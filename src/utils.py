@@ -58,8 +58,8 @@ def clean_df(df, split_name, clean_short_words: bool = False, short_text_threshh
     df = df.copy()
 
     # Force non-string types to NaN so str methods work reliably
-    df["text"] = df["text"].str.strip().str.replace(r"\s+", " ", regex=True).replace("", pd.NA)
     original_len = len(df)
+    df["text"] = df["text"].str.strip().str.replace(r"\s+", " ", regex=True).replace("", pd.NA)
     df["_original_index"] = np.arange(len(df))  # help track dropped cols
     null_mask  = df["text"].isna()
     empty_mask = df["text"].str.strip().eq("")
@@ -94,9 +94,15 @@ def clean_df(df, split_name, clean_short_words: bool = False, short_text_threshh
 def load_and_clean_data():
     train_df, dev_df, test_df = load_train_dev_test_splits()
     train_df, _, _ = clean_df(train_df, "train")
-    dev_df, dev_kept, dev_oglen   = clean_df(dev_df,   "dev") 
-    test_df, test_kept, test_oglen  = clean_df(test_df,  "test")
+
+    dev_ids  = pd.read_csv(os.path.join(constants.DATA_DIR, "dev_semeval_parids-labels.csv"),  dtype={"par_id": str})
+    dev_df,  dev_kept,  _ = clean_df(dev_df,  "dev")
+    test_df, test_kept, test_oglen = clean_df(test_df, "test")
+
+    dev_oglen = len(dev_ids)   # ← true ground truth: 2095
+
     return train_df, dev_df, dev_kept, dev_oglen, test_df, test_kept, test_oglen
+
 
 if __name__ == "__main__":
     load_and_clean_data()
