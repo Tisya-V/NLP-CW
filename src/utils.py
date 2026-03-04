@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import constants
+import numpy as np
 
 def load_full_dataset():
     """ Load the full dataset from the official PCL .tsv file
@@ -46,7 +47,7 @@ def load_train_dev_test_splits():
         os.path.join(constants.DATA_DIR, "task4_test.tsv"),
         sep="\t",
         names=test_cols,
-        skiprows=1,
+        skiprows=0,
         dtype={"par_id": str}
     )
     print("Data loaded successfully")
@@ -58,7 +59,8 @@ def clean_df(df, split_name, clean_short_words: bool = False, short_text_threshh
 
     # Force non-string types to NaN so str methods work reliably
     df["text"] = df["text"].str.strip().str.replace(r"\s+", " ", regex=True).replace("", pd.NA)
-
+    original_len = len(df)
+    df["_original_index"] = np.arange(len(df))  # help track dropped cols
     null_mask  = df["text"].isna()
     empty_mask = df["text"].str.strip().eq("")
     short_mask = df["text"].str.split().str.len() < short_text_threshhold
@@ -84,14 +86,17 @@ def clean_df(df, split_name, clean_short_words: bool = False, short_text_threshh
         print(df[bad_mask][drop_cols].to_string())
         df = df[~bad_mask].reset_index(drop=True)
 
-    return df
+    kept_indices = df["_original_index"].tolist()
+    df = df.drop(columns=["_original_index"]).reset_index(drop=True)
+    
+    return df, kept_indices, original_len
 
 def load_and_clean_data():
     train_df, dev_df, test_df = load_train_dev_test_splits()
-    train_df = clean_df(train_df, "train")
-    dev_df   = clean_df(dev_df,   "dev") 
-    test_df  = clean_df(test_df,  "test")
-    return train_df, dev_df, test_df
+    train_df, _, _ = clean_df(train_df, "train")
+    dev_df, dev_kept, dev_oglen   = clean_df(dev_df,   "dev") 
+    test_df, test_kept, test_oglen  = clean_df(test_df,  "test")
+    return train_df, dev_df, dev_kept, dev_oglen, test_df, test_kept, test_oglen
 
 if __name__ == "__main__":
     load_and_clean_data()
