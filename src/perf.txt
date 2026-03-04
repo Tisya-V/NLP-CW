@@ -14,3 +14,6 @@ weighted loss + augmentation (2) : 0.58
 weighted according to non-augmented dataset
 
 weighted loss (on non-aug training) + augmentation (3) + threshhold tuning : 0.60
+
+
+3109245
